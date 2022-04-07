@@ -28,11 +28,11 @@ module type S = {
   @ocaml.doc("Test whether a set is empty or not.")
   let isEmpty: t => bool
 
-  @ocaml.doc("[mem x s] tests whether [x] belongs to the set [s].")
+  @ocaml.doc("[mem s x] tests whether [x] belongs to the set [s].")
   let mem: (t, elt) => bool
 
   @ocaml.doc("
-  [add x s] returns a set containing all elements of [s],
+  [add s x] returns a set containing all elements of [s],
   plus [x]. If [x] was already in [s], [s] is returned unchanged.
   ")
   let add: (t, elt) => t
@@ -41,7 +41,7 @@ module type S = {
   let singleton: elt => t
 
   @ocaml.doc("
-  [remove x s] returns a set containing all elements of [s],
+  [remove s x] returns a set containing all elements of [s],
   except [x]. If [x] was not in [s], [s] is returned unchanged.
   ")
   let remove: (t, elt) => t
@@ -74,38 +74,38 @@ module type S = {
   let subset: (t, t) => bool
 
   @ocaml.doc("
-  [iter f s] applies [f] in turn to all elements of [s].
+  [iter s f] applies [f] in turn to all elements of [s].
   The elements of [s] are presented to [f] in increasing order
   with respect to the ordering over the type of the elements.
   ")
   let iter: (t, elt => unit) => unit
 
   @ocaml.doc("
-  [fold f s a] computes [(f xN ... (f x2 (f x1 a))...)],
+  [fold s f a] computes [(f xN ... (f x2 (f x1 a))...)],
   where [x1 ... xN] are the elements of [s], in increasing order.
   ")
   let fold: (t, (elt, 'a) => 'a, 'a) => 'a
 
   @ocaml.doc("
-  [for_all p s] checks if all elements of the set
+  [for_all s p] checks if all elements of the set
   satisfy the predicate [p].
   ")
   let forAll: (t, elt => bool) => bool
 
   @ocaml.doc("
-  [exists p s] checks if at least one element of
+  [exists s p] checks if at least one element of
   the set satisfies the predicate [p].
   ")
   let exists: (t, elt => bool) => bool
 
   @ocaml.doc("
-  [filter p s] returns the set of all elements in [s]
+  [filter s p] returns the set of all elements in [s]
   that satisfy predicate [p].
   ")
   let filter: (t, elt => bool) => t
 
   @ocaml.doc("
-  [partition p s] returns a pair of sets [(s1, s2)], where
+  [partition s p] returns a pair of sets [(s1, s2)], where
   [s1] is the set of all the elements of [s] that satisfy the
   predicate [p], and [s2] is the set of all the elements of
   [s] that do not satisfy [p].
@@ -144,7 +144,7 @@ module type S = {
   let choose: t => elt
 
   @ocaml.doc("
-  [split x s] returns a triple [(l, present, r)], where
+  [split s x] returns a triple [(l, present, r)], where
   [l] is the set of elements of [s] that are
   strictly less than [x];
   [r] is the set of elements of [s] that are
