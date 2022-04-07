@@ -204,7 +204,7 @@ function Make(funarg) {
             }
           };
   };
-  var add = function (x, s) {
+  var add = function (s, x) {
     var addAux = function (s) {
       if (typeof s === "number") {
         return {
@@ -251,7 +251,7 @@ function Make(funarg) {
     };
     return blackify(addAux(s))[0];
   };
-  var mem = function (x, _s) {
+  var mem = function (_s, x) {
     while(true) {
       var s = _s;
       if (typeof s === "number") {
@@ -509,7 +509,7 @@ function Make(funarg) {
             ];
     }
   };
-  var remove = function (x, s) {
+  var remove = function (s, x) {
     var removeAux = function (s) {
       if (typeof s === "number") {
         return [
@@ -666,16 +666,16 @@ function Make(funarg) {
           var x2 = e2._0;
           var c = Curry._2(funarg.compare, x1, x2);
           if (c < 0) {
-            _accu = add(x1, accu);
+            _accu = add(accu, x1);
             _e1 = $$enum(r1, e1$1);
             continue ;
           }
           if (c > 0) {
-            _accu = add(x2, accu);
+            _accu = add(accu, x2);
             _e2 = $$enum(r2, e2$1);
             continue ;
           }
-          _accu = add(x1, accu);
+          _accu = add(accu, x1);
           _e2 = $$enum(r2, e2$1);
           _e1 = $$enum(r1, e1$1);
           continue ;
@@ -691,7 +691,7 @@ function Make(funarg) {
         r = e2._1;
         e = e2._2;
       }
-      _accu = add(x, accu);
+      _accu = add(accu, x);
       _e2 = $$enum(r, e);
       _e1 = /* End */0;
       continue ;
@@ -725,7 +725,7 @@ function Make(funarg) {
         _e2 = $$enum(r2, e2$1);
         continue ;
       }
-      _accu = add(x1, accu);
+      _accu = add(accu, x1);
       _e2 = $$enum(r2, e2$1);
       _e1 = $$enum(r1, e1$1);
       continue ;
@@ -750,7 +750,7 @@ function Make(funarg) {
         var r2 = e2._1;
         var c = Curry._2(funarg.compare, x, e2._0);
         if (c < 0) {
-          _accu = add(x, accu);
+          _accu = add(accu, x);
           _e1 = $$enum(r, e);
           continue ;
         }
@@ -762,7 +762,7 @@ function Make(funarg) {
         _e1 = $$enum(r, e);
         continue ;
       }
-      _accu = add(x, accu);
+      _accu = add(accu, x);
       _e2 = /* End */0;
       _e1 = $$enum(r, e);
       continue ;
@@ -844,31 +844,31 @@ function Make(funarg) {
       continue ;
     };
   };
-  var iter = function (f, _s) {
+  var iter = function (_s, f) {
     while(true) {
       var s = _s;
       if (typeof s === "number") {
         return ;
       }
-      iter(f, s._0);
+      iter(s._0, f);
       Curry._1(f, s._1);
       _s = s._2;
       continue ;
     };
   };
-  var fold = function (f, _s, _accu) {
+  var fold = function (_s, f, _accu) {
     while(true) {
       var accu = _accu;
       var s = _s;
       if (typeof s === "number") {
         return accu;
       }
-      _accu = Curry._2(f, s._1, fold(f, s._0, accu));
+      _accu = Curry._2(f, s._1, fold(s._0, f, accu));
       _s = s._2;
       continue ;
     };
   };
-  var forAll = function (p, _s) {
+  var forAll = function (_s, p) {
     while(true) {
       var s = _s;
       if (typeof s === "number") {
@@ -877,14 +877,14 @@ function Make(funarg) {
       if (!Curry._1(p, s._1)) {
         return false;
       }
-      if (!forAll(p, s._0)) {
+      if (!forAll(s._0, p)) {
         return false;
       }
       _s = s._2;
       continue ;
     };
   };
-  var exists = function (p, _s) {
+  var exists = function (_s, p) {
     while(true) {
       var s = _s;
       if (typeof s === "number") {
@@ -893,14 +893,14 @@ function Make(funarg) {
       if (Curry._1(p, s._1)) {
         return true;
       }
-      if (exists(p, s._0)) {
+      if (exists(s._0, p)) {
         return true;
       }
       _s = s._2;
       continue ;
     };
   };
-  var filter = function (p, s) {
+  var filter = function (s, p) {
     var filterAux = function (_accu, _s) {
       while(true) {
         var s = _s;
@@ -910,13 +910,13 @@ function Make(funarg) {
         }
         var x = s._1;
         _s = s._2;
-        _accu = filterAux(Curry._1(p, x) ? add(x, accu) : accu, s._0);
+        _accu = filterAux(Curry._1(p, x) ? add(accu, x) : accu, s._0);
         continue ;
       };
     };
     return filterAux(/* Empty */0, s);
   };
-  var partition = function (p, s) {
+  var partition = function (s, p) {
     var partitionAux = function (_accu, _s) {
       while(true) {
         var s = _s;
@@ -929,11 +929,11 @@ function Make(funarg) {
         var x = s._1;
         _s = s._2;
         _accu = partitionAux(Curry._1(p, x) ? [
-                add(x, t),
+                add(t, x),
                 f
               ] : [
                 t,
-                add(x, f)
+                add(f, x)
               ], s._0);
         continue ;
       };
@@ -950,23 +950,23 @@ function Make(funarg) {
       return (1 + cardinal(s._0) | 0) + cardinal(s._2) | 0;
     }
   };
-  var elementsAux = function (_accu, _s) {
+  var elementsAux = function (_s, _accu) {
     while(true) {
-      var s = _s;
       var accu = _accu;
+      var s = _s;
       if (typeof s === "number") {
         return accu;
       }
-      _s = s._0;
       _accu = {
         hd: s._1,
-        tl: elementsAux(accu, s._2)
+        tl: elementsAux(s._2, accu)
       };
+      _s = s._0;
       continue ;
     };
   };
   var elements = function (s) {
-    return elementsAux(/* [] */0, s);
+    return elementsAux(s, /* [] */0);
   };
   var minElt = function (_s) {
     while(true) {
@@ -1027,7 +1027,7 @@ function Make(funarg) {
     }
     return s._1;
   };
-  var split = function (x, s) {
+  var split = function (s, x) {
     var splitAux = function (y, param) {
       var r = param[2];
       var b = param[1];
@@ -1037,11 +1037,11 @@ function Make(funarg) {
         return [
                 l,
                 b,
-                add(x, r)
+                add(r, x)
               ];
       } else if (c > 0) {
         return [
-                add(x, l),
+                add(l, x),
                 b,
                 r
               ];
@@ -1053,7 +1053,7 @@ function Make(funarg) {
               ];
       }
     };
-    return fold(splitAux, s, [
+    return fold(s, splitAux, [
                 /* Empty */0,
                 false,
                 /* Empty */0

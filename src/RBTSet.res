@@ -8,28 +8,28 @@ module type S = {
   type t
   let empty: t
   let isEmpty: t => bool
-  let mem: (elt, t) => bool
-  let add: (elt, t) => t
+  let mem: (t, elt) => bool
+  let add: (t, elt) => t
   let singleton: elt => t
-  let remove: (elt, t) => t
+  let remove: (t, elt) => t
   let union: (t, t) => t
   let inter: (t, t) => t
   let diff: (t, t) => t
   let compare: (t, t) => int
   let equal: (t, t) => bool
   let subset: (t, t) => bool
-  let iter: (elt => unit, t) => unit
-  let fold: ((elt, 'a) => 'a, t, 'a) => 'a
-  let forAll: (elt => bool, t) => bool
-  let exists: (elt => bool, t) => bool
-  let filter: (elt => bool, t) => t
-  let partition: (elt => bool, t) => (t, t)
+  let iter: (t, elt => unit) => unit
+  let fold: (t, (elt, 'a) => 'a, 'a) => 'a
+  let forAll: (t, elt => bool) => bool
+  let exists: (t, elt => bool) => bool
+  let filter: (t, elt => bool) => t
+  let partition: (t, elt => bool) => (t, t)
   let cardinal: t => int
   let elements: t => list<elt>
   let minElt: t => elt
   let maxElt: t => elt
   let choose: t => elt
-  let split: (elt, t) => (t, bool, t)
+  let split: (t, elt) => (t, bool, t)
 }
 
 module Make = (Ord: OrderedType) => {
@@ -75,7 +75,7 @@ module Make = (Ord: OrderedType) => {
     | (l, x, r) => Black(l, x, r)
     }
 
-  let add = (x, s) => {
+  let add = (s, x) => {
     let rec addAux = s =>
       switch s {
       | Empty => Red(Empty, x, Empty)
@@ -103,16 +103,16 @@ module Make = (Ord: OrderedType) => {
     fst(blackify(addAux(s)))
   }
 
-  let rec mem = (x, s) =>
+  let rec mem = (s, x) =>
     switch s {
     | Empty => false
     | Red(l, y, r)
     | Black(l, y, r) => {
         let c = Ord.compare(x, y)
         if c < 0 {
-          mem(x, l)
+          mem(l, x)
         } else if c > 0 {
-          mem(x, r)
+          mem(r, x)
         } else {
           true
         }
@@ -173,7 +173,7 @@ module Make = (Ord: OrderedType) => {
       }
     }
 
-  let remove = (x, s) => {
+  let remove = (s, x) => {
     let rec removeAux = s =>
       switch s {
       | Empty => (Empty, false)
@@ -253,15 +253,15 @@ module Make = (Ord: OrderedType) => {
       | (End, End) => accu
       | (End, More(x, r, e))
       | (More(x, r, e), End) =>
-        unionAux(End, enum(r, e), add(x, accu))
+        unionAux(End, enum(r, e), add(accu, x))
       | (More(x1, r1, e1) as e1', More(x2, r2, e2) as e2') => {
           let c = Ord.compare(x1, x2)
           if c < 0 {
-            unionAux(enum(r1, e1), e2', add(x1, accu))
+            unionAux(enum(r1, e1), e2', add(accu, x1))
           } else if c > 0 {
-            unionAux(e1', enum(r2, e2), add(x2, accu))
+            unionAux(e1', enum(r2, e2), add(accu, x2))
           } else {
-            unionAux(enum(r1, e1), enum(r2, e2), add(x1, accu))
+            unionAux(enum(r1, e1), enum(r2, e2), add(accu, x1))
           }
         }
       }
@@ -280,7 +280,7 @@ module Make = (Ord: OrderedType) => {
           } else if c > 0 {
             interAux(e1', enum(r2, e2), accu)
           } else {
-            interAux(enum(r1, e1), enum(r2, e2), add(x1, accu))
+            interAux(enum(r1, e1), enum(r2, e2), add(accu, x1))
           }
         }
       }
@@ -291,11 +291,11 @@ module Make = (Ord: OrderedType) => {
     let rec diffAux = (e1, e2, accu) =>
       switch (e1, e2) {
       | (End, _) => accu
-      | (More(x, r, e), End) => diffAux(enum(r, e), End, add(x, accu))
+      | (More(x, r, e), End) => diffAux(enum(r, e), End, add(accu, x))
       | (More(x1, r1, e1) as e1', More(x2, r2, e2) as e2') => {
           let c = Ord.compare(x1, x2)
           if c < 0 {
-            diffAux(enum(r1, e1), e2', add(x1, accu))
+            diffAux(enum(r1, e1), e2', add(accu, x1))
           } else if c > 0 {
             diffAux(e1', enum(r2, e2), accu)
           } else {
@@ -342,35 +342,35 @@ module Make = (Ord: OrderedType) => {
       }
     }
 
-  let rec iter = (f, s) =>
+  let rec iter = (s, f) =>
     switch s {
     | Empty => ()
     | Black(l, x, r) | Red(l, x, r) => {
-        iter(f, l)
+        iter(l, f)
         f(x)
-        iter(f, r)
+        iter(r, f)
       }
     }
 
-  let rec fold = (f, s, accu) =>
+  let rec fold = (s, f, accu) =>
     switch s {
     | Empty => accu
-    | Black(l, x, r) | Red(l, x, r) => fold(f, r, f(x, fold(f, l, accu)))
+    | Black(l, x, r) | Red(l, x, r) => fold(r, f, f(x, fold(l, f, accu)))
     }
 
-  let rec forAll = (p, s) =>
+  let rec forAll = (s, p) =>
     switch s {
     | Empty => true
-    | Black(l, x, r) | Red(l, x, r) => p(x) && (forAll(p, l) && forAll(p, r))
+    | Black(l, x, r) | Red(l, x, r) => p(x) && (forAll(l, p) && forAll(r, p))
     }
 
-  let rec exists = (p, s) =>
+  let rec exists = (s, p) =>
     switch s {
     | Empty => false
-    | Black(l, x, r) | Red(l, x, r) => p(x) || (exists(p, l) || exists(p, r))
+    | Black(l, x, r) | Red(l, x, r) => p(x) || (exists(l, p) || exists(r, p))
     }
 
-  let filter = (p, s) => {
+  let filter = (s, p) => {
     let rec filterAux = (accu, s) =>
       switch s {
       | Empty => accu
@@ -378,7 +378,7 @@ module Make = (Ord: OrderedType) => {
         filterAux(
           filterAux(
             if p(x) {
-              add(x, accu)
+              add(accu, x)
             } else {
               accu
             },
@@ -390,7 +390,7 @@ module Make = (Ord: OrderedType) => {
     filterAux(Empty, s)
   }
 
-  let partition = (p, s) => {
+  let partition = (s, p) => {
     let rec partitionAux = ((t, f) as accu, s) =>
       switch s {
       | Empty => accu
@@ -398,9 +398,9 @@ module Make = (Ord: OrderedType) => {
         partitionAux(
           partitionAux(
             if p(x) {
-              (add(x, t), f)
+              (add(t, x), f)
             } else {
-              (t, add(x, f))
+              (t, add(f, x))
             },
             l,
           ),
@@ -416,13 +416,13 @@ module Make = (Ord: OrderedType) => {
     | Black(l, _x, r) | Red(l, _x, r) => 1 + cardinal(l) + cardinal(r)
     }
 
-  let rec elementsAux = (accu, s) =>
+  let rec elementsAux = (s, accu) =>
     switch s {
     | Empty => accu
-    | Black(l, x, r) | Red(l, x, r) => elementsAux(list{x, ...elementsAux(accu, r)}, l)
+    | Black(l, x, r) | Red(l, x, r) => elementsAux(l, list{x, ...elementsAux(r, accu)})
     }
 
-  let elements = s => elementsAux(list{}, s)
+  let elements = s => elementsAux(s, list{})
 
   let rec minElt = s =>
     switch s {
@@ -444,17 +444,17 @@ module Make = (Ord: OrderedType) => {
     | Black(_, x, _) | Red(_, x, _) => x
     }
 
-  let split = (x, s) => {
+  let split = (s, x) => {
     let splitAux = (y, (l, b, r)) => {
       let c = Ord.compare(x, y)
       if c < 0 {
-        (l, b, add(x, r))
+        (l, b, add(r, x))
       } else if c > 0 {
-        (add(x, l), b, r)
+        (add(l, x), b, r)
       } else {
         (l, true, r)
       }
     }
-    fold(splitAux, s, (Empty, false, Empty))
+    fold(s, splitAux, (Empty, false, Empty))
   }
 }

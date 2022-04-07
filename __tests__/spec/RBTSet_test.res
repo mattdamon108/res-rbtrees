@@ -7,15 +7,15 @@ let testEqual = (t, name, lhs, rhs) =>
     done()
   })
 
-module Key = {
+module KeyS = {
   type t = int
   let compare = Pervasives.compare
 }
 
-module Set = RBTSet.Make(Key)
+module Set = RBTSet.Make(KeyS)
 
 let empty = Set.empty
-let m1 = Set.add(1, empty)
+let m1 = empty->Set.add(1)
 
 zoraBlock("-- isEmpty --", t => {
   t->testEqual("* empty", empty->Set.isEmpty, true)
@@ -23,7 +23,7 @@ zoraBlock("-- isEmpty --", t => {
 })
 
 zoraBlock("-- add & mem --", t => {
-  let m2 = Set.add(2, m1)
-  let m3 = Set.add(3, m2)
-  t->testEqual("* mem 2", Set.mem(2, m3), true)
+  let m2 = m1->Set.add(2)
+  let m3 = m2->Set.add(3)
+  t->testEqual("* mem 2", m3->Set.mem(2), true)
 })

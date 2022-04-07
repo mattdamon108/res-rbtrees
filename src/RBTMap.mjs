@@ -20,20 +20,20 @@ function Make(funarg) {
       continue ;
     };
   };
-  var blackify = function (n) {
-    if (typeof n === "number" || n.TAG === /* Black */0) {
+  var blackify = function (m) {
+    if (typeof m === "number" || m.TAG === /* Black */0) {
       return [
-              n,
+              m,
               true
             ];
     } else {
       return [
               {
                 TAG: /* Black */0,
-                _0: n._0,
-                _1: n._1,
-                _2: n._2,
-                _3: n._3
+                _0: m._0,
+                _1: m._1,
+                _2: m._2,
+                _3: m._3
               },
               false
             ];
@@ -214,7 +214,7 @@ function Make(funarg) {
       
     }
   };
-  var add = function (kx, x, m) {
+  var add = function (m, kx, x) {
     var add_aux = function (m) {
       if (typeof m === "number") {
         return {
@@ -278,31 +278,31 @@ function Make(funarg) {
     };
     return blackify(add_aux(m))[0];
   };
-  var find = function (k, _n) {
+  var find = function (_m, k) {
     while(true) {
-      var n = _n;
-      if (typeof n === "number") {
+      var m = _m;
+      if (typeof m === "number") {
         throw {
               RE_EXN_ID: "Not_found",
               Error: new Error()
             };
       }
-      var c = Curry._2(funarg.compare, k, n._1);
+      var c = Curry._2(funarg.compare, k, m._1);
       if (c < 0) {
-        _n = n._0;
+        _m = m._0;
         continue ;
       }
       if (c <= 0) {
-        return n._2;
+        return m._2;
       }
-      _n = n._3;
+      _m = m._3;
       continue ;
     };
   };
-  var unbalancedLeft = function (n) {
-    if (typeof n !== "number") {
-      if (n.TAG === /* Black */0) {
-        var match = n._0;
+  var unbalancedLeft = function (m) {
+    if (typeof m !== "number") {
+      if (m.TAG === /* Black */0) {
+        var match = m._0;
         if (typeof match !== "number") {
           if (match.TAG === /* Black */0) {
             return [
@@ -312,7 +312,7 @@ function Make(funarg) {
                           _1: match._1,
                           _2: match._2,
                           _3: match._3
-                        }, n._1, n._2, n._3),
+                        }, m._1, m._2, m._3),
                     true
                   ];
           }
@@ -330,7 +330,7 @@ function Make(funarg) {
                             _1: match$1._1,
                             _2: match$1._2,
                             _3: match$1._3
-                          }, n._1, n._2, n._3)
+                          }, m._1, m._2, m._3)
                     },
                     false
                   ];
@@ -339,7 +339,7 @@ function Make(funarg) {
         }
         
       } else {
-        var match$2 = n._0;
+        var match$2 = m._0;
         if (typeof match$2 !== "number" && match$2.TAG === /* Black */0) {
           return [
                   balanceLeft({
@@ -348,7 +348,7 @@ function Make(funarg) {
                         _1: match$2._1,
                         _2: match$2._2,
                         _3: match$2._3
-                      }, n._1, n._2, n._3),
+                      }, m._1, m._2, m._3),
                   false
                 ];
         }
@@ -365,13 +365,13 @@ function Make(funarg) {
           Error: new Error()
         };
   };
-  var unbalancedRight = function (n) {
-    if (typeof n !== "number") {
-      if (n.TAG === /* Black */0) {
-        var match = n._3;
-        var x = n._2;
-        var kx = n._1;
-        var a = n._0;
+  var unbalancedRight = function (m) {
+    if (typeof m !== "number") {
+      if (m.TAG === /* Black */0) {
+        var match = m._3;
+        var x = m._2;
+        var kx = m._1;
+        var a = m._0;
         if (typeof match !== "number") {
           if (match.TAG === /* Black */0) {
             return [
@@ -408,10 +408,10 @@ function Make(funarg) {
         }
         
       } else {
-        var match$2 = n._3;
+        var match$2 = m._3;
         if (typeof match$2 !== "number" && match$2.TAG === /* Black */0) {
           return [
-                  balanceRight(n._0, n._1, n._2, {
+                  balanceRight(m._0, m._1, m._2, {
                         TAG: /* Red */1,
                         _0: match$2._0,
                         _1: match$2._1,
@@ -434,8 +434,8 @@ function Make(funarg) {
           Error: new Error()
         };
   };
-  var removeMin = function (n) {
-    if (typeof n === "number") {
+  var removeMin = function (m) {
+    if (typeof m === "number") {
       throw {
             RE_EXN_ID: "Assert_failure",
             _1: [
@@ -446,12 +446,12 @@ function Make(funarg) {
             Error: new Error()
           };
     }
-    if (n.TAG === /* Black */0) {
-      var l = n._0;
+    if (m.TAG === /* Black */0) {
+      var l = m._0;
       if (typeof l === "number") {
-        var match = n._3;
-        var x = n._2;
-        var kx = n._1;
+        var match = m._3;
+        var x = m._2;
+        var kx = m._1;
         if (typeof match === "number") {
           return [
                   /* Empty */0,
@@ -488,10 +488,10 @@ function Make(funarg) {
         var y = match$1[2];
         var ky = match$1[1];
         var m_0 = match$1[0];
-        var m_1 = n._1;
-        var m_2 = n._2;
-        var m_3 = n._3;
-        var m = {
+        var m_1 = m._1;
+        var m_2 = m._2;
+        var m_3 = m._3;
+        var m$1 = {
           TAG: /* Black */0,
           _0: m_0,
           _1: m_1,
@@ -500,13 +500,13 @@ function Make(funarg) {
         };
         if (!match$1[3]) {
           return [
-                  m,
+                  m$1,
                   ky,
                   y,
                   false
                 ];
         }
-        var match$2 = unbalancedRight(m);
+        var match$2 = unbalancedRight(m$1);
         return [
                 match$2[0],
                 ky,
@@ -515,12 +515,12 @@ function Make(funarg) {
               ];
       }
     } else {
-      var l$1 = n._0;
+      var l$1 = m._0;
       if (typeof l$1 === "number") {
         return [
-                n._3,
-                n._1,
-                n._2,
+                m._3,
+                m._1,
+                m._2,
                 false
               ];
       }
@@ -528,10 +528,10 @@ function Make(funarg) {
       var y$1 = match$3[2];
       var ky$1 = match$3[1];
       var m_0$1 = match$3[0];
-      var m_1$1 = n._1;
-      var m_2$1 = n._2;
-      var m_3$1 = n._3;
-      var m$1 = {
+      var m_1$1 = m._1;
+      var m_2$1 = m._2;
+      var m_3$1 = m._3;
+      var m$2 = {
         TAG: /* Red */1,
         _0: m_0$1,
         _1: m_1$1,
@@ -540,13 +540,13 @@ function Make(funarg) {
       };
       if (!match$3[3]) {
         return [
-                m$1,
+                m$2,
                 ky$1,
                 y$1,
                 false
               ];
       }
-      var match$4 = unbalancedRight(m$1);
+      var match$4 = unbalancedRight(m$2);
       return [
               match$4[0],
               ky$1,
@@ -555,7 +555,7 @@ function Make(funarg) {
             ];
     }
   };
-  var remove = function (k, m) {
+  var remove = function (m, k) {
     var removeAux = function (n) {
       if (typeof n === "number") {
         return [
@@ -701,93 +701,93 @@ function Make(funarg) {
     };
     return removeAux(m)[0];
   };
-  var mem = function (k, _n) {
+  var mem = function (_m, k) {
     while(true) {
-      var n = _n;
-      if (typeof n === "number") {
+      var m = _m;
+      if (typeof m === "number") {
         return false;
       }
-      var c = Curry._2(funarg.compare, k, n._1);
+      var c = Curry._2(funarg.compare, k, m._1);
       if (c < 0) {
-        _n = n._0;
+        _m = m._0;
         continue ;
       }
       if (c <= 0) {
         return true;
       }
-      _n = n._3;
+      _m = m._3;
       continue ;
     };
   };
-  var iter = function (f, _n) {
+  var iter = function (_m, f) {
     while(true) {
-      var n = _n;
-      if (typeof n === "number") {
+      var m = _m;
+      if (typeof m === "number") {
         return ;
       }
-      iter(f, n._0);
-      Curry._2(f, n._1, n._2);
-      _n = n._3;
+      iter(m._0, f);
+      Curry._2(f, m._1, m._2);
+      _m = m._3;
       continue ;
     };
   };
-  var map = function (f, n) {
-    if (typeof n === "number") {
+  var map = function (m, f) {
+    if (typeof m === "number") {
       return /* Empty */0;
-    } else if (n.TAG === /* Black */0) {
+    } else if (m.TAG === /* Black */0) {
       return {
               TAG: /* Black */0,
-              _0: map(f, n._0),
-              _1: n._1,
-              _2: Curry._1(f, n._2),
-              _3: map(f, n._3)
+              _0: map(m._0, f),
+              _1: m._1,
+              _2: Curry._1(f, m._2),
+              _3: map(m._3, f)
             };
     } else {
       return {
               TAG: /* Red */1,
-              _0: map(f, n._0),
-              _1: n._1,
-              _2: Curry._1(f, n._2),
-              _3: map(f, n._3)
+              _0: map(m._0, f),
+              _1: m._1,
+              _2: Curry._1(f, m._2),
+              _3: map(m._3, f)
             };
     }
   };
-  var mapi = function (f, n) {
-    if (typeof n === "number") {
+  var mapi = function (m, f) {
+    if (typeof m === "number") {
       return /* Empty */0;
     }
-    if (n.TAG === /* Black */0) {
-      var k = n._1;
+    if (m.TAG === /* Black */0) {
+      var k = m._1;
       return {
               TAG: /* Black */0,
-              _0: mapi(f, n._0),
+              _0: mapi(m._0, f),
               _1: k,
-              _2: Curry._2(f, k, n._2),
-              _3: mapi(f, n._3)
+              _2: Curry._2(f, k, m._2),
+              _3: mapi(m._3, f)
             };
     }
-    var k$1 = n._1;
+    var k$1 = m._1;
     return {
             TAG: /* Red */1,
-            _0: mapi(f, n._0),
+            _0: mapi(m._0, f),
             _1: k$1,
-            _2: Curry._2(f, k$1, n._2),
-            _3: mapi(f, n._3)
+            _2: Curry._2(f, k$1, m._2),
+            _3: mapi(m._3, f)
           };
   };
-  var fold = function (f, _m, _accu) {
+  var fold = function (_m, f, _accu) {
     while(true) {
       var accu = _accu;
       var m = _m;
       if (typeof m === "number") {
         return accu;
       }
-      _accu = Curry._3(f, m._1, m._2, fold(f, m._0, accu));
+      _accu = Curry._3(f, m._1, m._2, fold(m._0, f, accu));
       _m = m._3;
       continue ;
     };
   };
-  var compare = function (cmp, m1, m2) {
+  var compare = function (m1, m2, cmp) {
     var _e1 = $$enum(m1, /* End */0);
     var _e2 = $$enum(m2, /* End */0);
     while(true) {
@@ -816,7 +816,7 @@ function Make(funarg) {
       continue ;
     };
   };
-  var equal = function (cmp, m1, m2) {
+  var equal = function (m1, m2, cmp) {
     var _e1 = $$enum(m1, /* End */0);
     var _e2 = $$enum(m2, /* End */0);
     while(true) {

@@ -32,25 +32,25 @@ module type S = {
   [m], plus a binding of [x] to [y]. If [x] was already bound
   in [m], its previous binding disappears.
   ")
-  let add: (key, 'a, t<'a>) => t<'a>
+  let add: (t<'a>, key, 'a) => t<'a>
 
   @ocaml.doc("
   [find x m] returns the current binding of [x] in [m],
   or raises [Not_found] if no such binding exists.
   ")
-  let find: (key, t<'a>) => 'a
+  let find: (t<'a>, key) => 'a
 
   @ocaml.doc("
   [remove x m] returns a map containing the same bindings as
   [m], except for [x] which is unbound in the returned map.
   ")
-  let remove: (key, t<'a>) => t<'a>
+  let remove: (t<'a>, key) => t<'a>
 
   @ocaml.doc("
   [mem x m] returns [true] if [m] contains a binding for [x],
   and [false] otherwise.
   ")
-  let mem: (key, t<'a>) => bool
+  let mem: (t<'a>, key) => bool
 
   @ocaml.doc("
   [iter f m] applies [f] to all bindings in map [m].
@@ -58,7 +58,7 @@ module type S = {
   as second argument.  The bindings are passed to [f] in increasing
   order with respect to the ordering over the type of the keys.
   ")
-  let iter: ((key, 'a) => unit, t<'a>) => unit
+  let iter: (t<'a>, (key, 'a) => unit) => unit
 
   @ocaml.doc("
   [map f m] returns a map with same domain as [m], where the
@@ -67,26 +67,26 @@ module type S = {
   The bindings are passed to [f] in increasing order
   with respect to the ordering over the type of the keys.
   ")
-  let map: ('a => 'b, t<'a>) => t<'b>
+  let map: (t<'a>, 'a => 'b) => t<'b>
 
   @ocaml.doc("
   Same as {!Map.S.map}, but the function receives as arguments both the
   key and the associated value for each binding of the map.
   ")
-  let mapi: ((key, 'a) => 'b, t<'a>) => t<'b>
+  let mapi: (t<'a>, (key, 'a) => 'b) => t<'b>
 
   @ocaml.doc("
   [fold f m a] computes [(f kN dN ... (f k1 d1 a)...)],
   where [k1 ... kN] are the keys of all bindings in [m]
   (in increasing order), and [d1 ... dN] are the associated data.
   ")
-  let fold: ((key, 'a, 'b) => 'b, t<'a>, 'b) => 'b
+  let fold: (t<'a>, (key, 'a, 'b) => 'b, 'b) => 'b
 
   @ocaml.doc("
   Total ordering between maps.  The first argument is a total ordering
   used to compare data associated with equal keys in the two maps.
   ")
-  let compare: (('a, 'a) => int, t<'a>, t<'a>) => int
+  let compare: (t<'a>, t<'a>, ('a, 'a) => int) => int
 
   @ocaml.doc("
   [equal cmp m1 m2] tests whether the maps [m1] and [m2] are
@@ -94,7 +94,7 @@ module type S = {
   equal data.  [cmp] is the equality predicate used to compare
   the data associated with the keys.
   ")
-  let equal: (('a, 'a) => bool, t<'a>, t<'a>) => bool
+  let equal: (t<'a>, t<'a>, ('a, 'a) => bool) => bool
 }
 
 @ocaml.doc("

@@ -16,15 +16,15 @@ function testEqual(t, name, lhs, rhs) {
 
 var compare = Caml_obj.caml_compare;
 
-var Key = {
+var KeyS = {
   compare: compare
 };
 
-var $$Set = RBTSet.Make(Key);
+var $$Set = RBTSet.Make(KeyS);
 
 var empty = $$Set.empty;
 
-var m1 = Curry._2($$Set.add, 1, empty);
+var m1 = Curry._2($$Set.add, empty, 1);
 
 Zora$1.test("-- isEmpty --", (function (t) {
         testEqual(t, "* empty", Curry._1($$Set.isEmpty, empty), true);
@@ -32,14 +32,14 @@ Zora$1.test("-- isEmpty --", (function (t) {
       }));
 
 Zora$1.test("-- add & mem --", (function (t) {
-        var m2 = Curry._2($$Set.add, 2, m1);
-        var m3 = Curry._2($$Set.add, 3, m2);
-        return testEqual(t, "* mem 2", Curry._2($$Set.mem, 2, m3), true);
+        var m2 = Curry._2($$Set.add, m1, 2);
+        var m3 = Curry._2($$Set.add, m2, 3);
+        return testEqual(t, "* mem 2", Curry._2($$Set.mem, m3, 2), true);
       }));
 
 export {
   testEqual ,
-  Key ,
+  KeyS ,
   $$Set ,
   empty ,
   m1 ,

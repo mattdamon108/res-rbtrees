@@ -14,15 +14,15 @@ function testEqual(t, name, lhs, rhs) {
   
 }
 
-var Key = {
+var KeyM = {
   compare: $$String.compare
 };
 
-var $$Map = RBTMap.Make(Key);
+var $$Map = RBTMap.Make(KeyM);
 
 var empty = $$Map.empty;
 
-var m1 = Curry._3($$Map.add, "ReScript", "awesome", empty);
+var m1 = Curry._3($$Map.add, empty, "ReScript", "awesome");
 
 Zora$1.test("-- isEmpty --", (function (t) {
         testEqual(t, "* empty", Curry._1($$Map.isEmpty, empty), true);
@@ -30,14 +30,14 @@ Zora$1.test("-- isEmpty --", (function (t) {
       }));
 
 Zora$1.test("-- add & find --", (function (t) {
-        var m2 = Curry._3($$Map.add, "OCaml", "super awesome", m1);
-        var m3 = Curry._3($$Map.add, "Reason", "deprecated", m2);
-        return testEqual(t, "* OCaml should be super awesome ", Curry._2($$Map.find, "OCaml", m3), "super awesome");
+        var m2 = Curry._3($$Map.add, m1, "OCaml", "super awesome");
+        var m3 = Curry._3($$Map.add, m2, "Reason", "deprecated");
+        return testEqual(t, "* OCaml should be super awesome ", Curry._2($$Map.find, m3, "OCaml"), "super awesome");
       }));
 
 export {
   testEqual ,
-  Key ,
+  KeyM ,
   $$Map ,
   empty ,
   m1 ,

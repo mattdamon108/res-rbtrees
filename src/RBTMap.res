@@ -8,16 +8,16 @@ module type S = {
   type t<'a>
   let empty: t<'a>
   let isEmpty: t<'a> => bool
-  let add: (key, 'a, t<'a>) => t<'a>
-  let find: (key, t<'a>) => 'a
-  let remove: (key, t<'a>) => t<'a>
-  let mem: (key, t<'a>) => bool
-  let iter: ((key, 'a) => unit, t<'a>) => unit
-  let map: ('a => 'b, t<'a>) => t<'b>
-  let mapi: ((key, 'a) => 'b, t<'a>) => t<'b>
-  let fold: ((key, 'a, 'b) => 'b, t<'a>, 'b) => 'b
-  let compare: (('a, 'a) => int, t<'a>, t<'a>) => int
-  let equal: (('a, 'a) => bool, t<'a>, t<'a>) => bool
+  let add: (t<'a>, key, 'a) => t<'a>
+  let find: (t<'a>, key) => 'a
+  let remove: (t<'a>, key) => t<'a>
+  let mem: (t<'a>, key) => bool
+  let iter: (t<'a>, (key, 'a) => unit) => unit
+  let map: (t<'a>, 'a => 'b) => t<'b>
+  let mapi: (t<'a>, (key, 'a) => 'b) => t<'b>
+  let fold: (t<'a>, (key, 'a, 'b) => 'b, 'b) => 'b
+  let compare: (t<'a>, t<'a>, ('a, 'a) => int) => int
+  let equal: (t<'a>, t<'a>, ('a, 'a) => bool) => bool
 }
 
 module Make = (Ord: OrderedType) => {
@@ -33,8 +33,8 @@ module Make = (Ord: OrderedType) => {
     | Black(l, k, x, r) | Red(l, k, x, r) => enum(l, More(k, x, r, e))
     }
 
-  let blackify = n =>
-    switch n {
+  let blackify = m =>
+    switch m {
     | Red(l, k, x, r) => (Black(l, k, x, r), false)
     | m => (m, true)
     }
@@ -63,7 +63,7 @@ module Make = (Ord: OrderedType) => {
     | (l, kx, x, r) => Black(l, kx, x, r)
     }
 
-  let add = (kx, x, m) => {
+  let add = (m, kx, x) => {
     let rec add_aux = m =>
       switch m {
       | Empty => Red(Empty, kx, x, Empty)
@@ -91,24 +91,24 @@ module Make = (Ord: OrderedType) => {
     fst(blackify(add_aux(m)))
   }
 
-  let rec find = (k, n) =>
-    switch n {
+  let rec find = (m, k) =>
+    switch m {
     | Empty => raise(Not_found)
     | Red(l, kx, x, r)
     | Black(l, kx, x, r) => {
         let c = Ord.compare(k, kx)
         if c < 0 {
-          find(k, l)
+          find(l, k)
         } else if c > 0 {
-          find(k, r)
+          find(r, k)
         } else {
           x
         }
       }
     }
 
-  let unbalancedLeft = n =>
-    switch n {
+  let unbalancedLeft = m =>
+    switch m {
     | Red(Black(a, kx, x, b), ky, y, c) => (balanceLeft(Red(a, kx, x, b), ky, y, c), false)
     | Black(Black(a, kx, x, b), ky, y, c) => (balanceLeft(Red(a, kx, x, b), ky, y, c), true)
     | Black(Red(a, kx, x, Black(b, ky, y, c)), kz, z, d) => (
@@ -118,8 +118,8 @@ module Make = (Ord: OrderedType) => {
     | _ => assert false
     }
 
-  let unbalancedRight = n =>
-    switch n {
+  let unbalancedRight = m =>
+    switch m {
     | Red(a, kx, x, Black(b, ky, y, c)) => (balanceRight(a, kx, x, Red(b, ky, y, c)), false)
     | Black(a, kx, x, Black(b, ky, y, c)) => (balanceRight(a, kx, x, Red(b, ky, y, c)), true)
     | Black(a, kx, x, Red(Black(b, ky, y, c), kz, z, d)) => (
@@ -129,8 +129,8 @@ module Make = (Ord: OrderedType) => {
     | _ => assert false
     }
 
-  let rec removeMin = n =>
-    switch n {
+  let rec removeMin = m =>
+    switch m {
     | Empty
     | Black(Empty, _, _, Black(_)) =>
       assert false
@@ -159,7 +159,7 @@ module Make = (Ord: OrderedType) => {
       }
     }
 
-  let remove = (k, m) => {
+  let remove = (m, k) => {
     let rec removeAux = n =>
       switch n {
       | Empty => (Empty, false)
@@ -233,53 +233,53 @@ module Make = (Ord: OrderedType) => {
     fst(removeAux(m))
   }
 
-  let rec mem = (k, n) =>
-    switch n {
+  let rec mem = (m, k) =>
+    switch m {
     | Empty => false
     | Red(l, kx, _x, r)
     | Black(l, kx, _x, r) => {
         let c = Ord.compare(k, kx)
         if c < 0 {
-          mem(k, l)
+          mem(l, k)
         } else if c > 0 {
-          mem(k, r)
+          mem(r, k)
         } else {
           true
         }
       }
     }
 
-  let rec iter = (f, n) =>
-    switch n {
+  let rec iter = (m, f) =>
+    switch m {
     | Empty => ()
     | Red(l, k, x, r) | Black(l, k, x, r) => {
-        iter(f, l)
+        iter(l, f)
         f(k, x)
-        iter(f, r)
+        iter(r, f)
       }
     }
 
-  let rec map = (f, n) =>
-    switch n {
+  let rec map = (m, f) =>
+    switch m {
     | Empty => Empty
-    | Red(l, k, x, r) => Red(map(f, l), k, f(x), map(f, r))
-    | Black(l, k, x, r) => Black(map(f, l), k, f(x), map(f, r))
+    | Red(l, k, x, r) => Red(map(l, f), k, f(x), map(r, f))
+    | Black(l, k, x, r) => Black(map(l, f), k, f(x), map(r, f))
     }
 
-  let rec mapi = (f, n) =>
-    switch n {
+  let rec mapi = (m, f) =>
+    switch m {
     | Empty => Empty
-    | Red(l, k, x, r) => Red(mapi(f, l), k, f(k, x), mapi(f, r))
-    | Black(l, k, x, r) => Black(mapi(f, l), k, f(k, x), mapi(f, r))
+    | Red(l, k, x, r) => Red(mapi(l, f), k, f(k, x), mapi(r, f))
+    | Black(l, k, x, r) => Black(mapi(l, f), k, f(k, x), mapi(r, f))
     }
 
-  let rec fold = (f, m, accu) =>
+  let rec fold = (m, f, accu) =>
     switch m {
     | Empty => accu
-    | Red(l, k, x, r) | Black(l, k, x, r) => fold(f, r, f(k, x, fold(f, l, accu)))
+    | Red(l, k, x, r) | Black(l, k, x, r) => fold(r, f, f(k, x, fold(l, f, accu)))
     }
 
-  let compare = (cmp, m1, m2) => {
+  let compare = (m1, m2, cmp) => {
     let rec compareAux = (e1, e2) =>
       switch (e1, e2) {
       | (End, End) => 0
@@ -302,7 +302,7 @@ module Make = (Ord: OrderedType) => {
     compareAux(enum(m1, End), enum(m2, End))
   }
 
-  let equal = (cmp, m1, m2) => {
+  let equal = (m1, m2, cmp) => {
     let rec equalAux = (e1, e2) =>
       switch (e1, e2) {
       | (End, End) => true

@@ -7,15 +7,15 @@ let testEqual = (t, name, lhs, rhs) =>
     done()
   })
 
-module Key = {
+module KeyM = {
   type t = string
   let compare = String.compare
 }
 
-module Map = RBTMap.Make(Key)
+module Map = RBTMap.Make(KeyM)
 
 let empty = Map.empty
-let m1 = Map.add("ReScript", "awesome", empty)
+let m1 = empty->Map.add("ReScript", "awesome")
 
 zoraBlock("-- isEmpty --", t => {
   t->testEqual("* empty", empty->Map.isEmpty, true)
@@ -23,7 +23,7 @@ zoraBlock("-- isEmpty --", t => {
 })
 
 zoraBlock("-- add & find --", t => {
-  let m2 = Map.add("OCaml", "super awesome", m1)
-  let m3 = Map.add("Reason", "deprecated", m2)
-  t->testEqual("* OCaml should be super awesome ", Map.find("OCaml", m3), "super awesome")
+  let m2 = m1->Map.add("OCaml", "super awesome")
+  let m3 = m2->Map.add("Reason", "deprecated")
+  t->testEqual("* OCaml should be super awesome ", m3->Map.find("OCaml"), "super awesome")
 })

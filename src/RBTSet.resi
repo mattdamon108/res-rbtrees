@@ -29,13 +29,13 @@ module type S = {
   let isEmpty: t => bool
 
   @ocaml.doc("[mem x s] tests whether [x] belongs to the set [s].")
-  let mem: (elt, t) => bool
+  let mem: (t, elt) => bool
 
   @ocaml.doc("
   [add x s] returns a set containing all elements of [s],
   plus [x]. If [x] was already in [s], [s] is returned unchanged.
   ")
-  let add: (elt, t) => t
+  let add: (t, elt) => t
 
   @ocaml.doc("[singleton x] returns the one-element set containing only [x].")
   let singleton: elt => t
@@ -44,7 +44,7 @@ module type S = {
   [remove x s] returns a set containing all elements of [s],
   except [x]. If [x] was not in [s], [s] is returned unchanged.
   ")
-  let remove: (elt, t) => t
+  let remove: (t, elt) => t
 
   @ocaml.doc("Set union.")
   let union: (t, t) => t
@@ -78,31 +78,31 @@ module type S = {
   The elements of [s] are presented to [f] in increasing order
   with respect to the ordering over the type of the elements.
   ")
-  let iter: (elt => unit, t) => unit
+  let iter: (t, elt => unit) => unit
 
   @ocaml.doc("
   [fold f s a] computes [(f xN ... (f x2 (f x1 a))...)],
   where [x1 ... xN] are the elements of [s], in increasing order.
   ")
-  let fold: ((elt, 'a) => 'a, t, 'a) => 'a
+  let fold: (t, (elt, 'a) => 'a, 'a) => 'a
 
   @ocaml.doc("
   [for_all p s] checks if all elements of the set
   satisfy the predicate [p].
   ")
-  let forAll: (elt => bool, t) => bool
+  let forAll: (t, elt => bool) => bool
 
   @ocaml.doc("
   [exists p s] checks if at least one element of
   the set satisfies the predicate [p].
   ")
-  let exists: (elt => bool, t) => bool
+  let exists: (t, elt => bool) => bool
 
   @ocaml.doc("
   [filter p s] returns the set of all elements in [s]
   that satisfy predicate [p].
   ")
-  let filter: (elt => bool, t) => t
+  let filter: (t, elt => bool) => t
 
   @ocaml.doc("
   [partition p s] returns a pair of sets [(s1, s2)], where
@@ -110,7 +110,7 @@ module type S = {
   predicate [p], and [s2] is the set of all the elements of
   [s] that do not satisfy [p].
   ")
-  let partition: (elt => bool, t) => (t, t)
+  let partition: (t, elt => bool) => (t, t)
 
   @ocaml.doc("Return the number of elements of a set.")
   let cardinal: t => int
@@ -152,7 +152,7 @@ module type S = {
   [present] is [false] if [s] contains no element equal to [x],
   or [true] if [s] contains an element equal to [x].
   ")
-  let split: (elt, t) => (t, bool, t)
+  let split: (t, elt) => (t, bool, t)
 }
 
 @ocaml.doc("
