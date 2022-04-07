@@ -1,0 +1,2 @@
+src/**/*.mjs    linguist-generated
+__tests__/**/*.mjs   linguist-generated

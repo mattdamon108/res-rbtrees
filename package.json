@@ -1,0 +1,29 @@
+{
+  "name": "res-rbtrees",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "res:build": "rescript",
+    "res:clean": "rescript clean",
+    "res:watch": "rescript build -w",
+    "test:watch": "onchange --initial '{__tests__,src}/**/*.mjs' -- pta '__tests__/**/*.mjs' | tap-difflet",
+    "test": "pta './__tests__/Index.mjs' | tap-difflet"
+  },
+  "keywords": [
+    "Red-Black trees",
+    "ReScript"
+  ],
+  "author": "Woonki Moon<woonki.moon@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@dusty-phillips/rescript-zora": "^3.0.0",
+    "onchange": "^7.1.0",
+    "pta": "^1.0.2",
+    "rescript": "^9.1.4",
+    "tap-difflet": "^0.7.2",
+    "zora": "^5.0.3"
+  },
+  "dependencies": {
+    "@rescript/std": "^9.1.3"
+  }
+}
